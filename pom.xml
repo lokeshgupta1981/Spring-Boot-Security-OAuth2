@@ -12,6 +12,8 @@
   <url>https://howtodoinjava.com</url>
   <modules>
     <module>Spring-boot-keycloak-oauth2</module>
+    <module>spring-boot-embedded-keycloak</module>
+    <module>spring-boot-keycloak-testcontainer</module>
   </modules>
   <packaging>pom</packaging>
 

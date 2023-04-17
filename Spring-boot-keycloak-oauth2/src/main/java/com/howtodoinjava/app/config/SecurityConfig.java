@@ -17,6 +17,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login();
+
        return  httpSecurity.build();
     }
 }
