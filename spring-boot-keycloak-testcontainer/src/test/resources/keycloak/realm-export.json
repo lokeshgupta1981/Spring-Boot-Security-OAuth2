@@ -1,6 +1,6 @@
 {
-  "id": "howtodoinjava",
-  "realm": "howtodoinjava",
+  "id": "c8b73897-73e2-4b87-b5bc-1f7fd71dbf6f",
+  "realm": "howtodoinjava-realm",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -45,11 +45,11 @@
   "failureFactor": 30,
   "defaultRole": {
     "id": "ae0de638-8b16-4d7f-9c1d-e1a55129f895",
-    "name": "default-roles-howtodoinjava",
+    "name": "default-roles-howtodoinjava-realm",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
-    "containerId": "howtodoinjava"
+    "containerId": "c8b73897-73e2-4b87-b5bc-1f7fd71dbf6f"
   },
   "requiredCredentials": [
     "password"
@@ -112,13 +112,13 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/howtodoinjava/account/",
+      "baseUrl": "/realms/howtodoinjava-realm/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/howtodoinjava/account/*"
+        "/realms/howtodoinjava-realm/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -153,13 +153,13 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/howtodoinjava/account/",
+      "baseUrl": "/realms/howtodoinjava-realm/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/howtodoinjava/account/*"
+        "/realms/howtodoinjava-realm/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -240,7 +240,7 @@
     },
     {
       "id": "c683c33f-a584-46b1-af9f-d401ba93af85",
-      "clientId": "howtodoinjava-api",
+      "clientId": "employee-management-api",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -356,13 +356,13 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/howtodoinjava/console/",
+      "baseUrl": "/admin/howtodoinjava-realm/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/admin/howtodoinjava/console/*"
+        "/admin/howtodoinjava-realm/console/*"
       ],
       "webOrigins": [
         "+"
@@ -1781,15 +1781,15 @@
   },
   "users": [
     {
-      "username": "janedoe",
-      "email": "jane.doe@howtodoinjava.com",
-      "firstName": "Jane",
-      "lastName": "Doe",
+      "username": "test-user",
+      "email": "test-user@howtodoinjava.com",
+      "firstName": "TestUser",
+      "lastName": "",
       "enabled": true,
       "credentials": [
         {
           "type": "password",
-          "value": "s3cr3t"
+          "value": "password"
         }
       ],
       "clientRoles": {
