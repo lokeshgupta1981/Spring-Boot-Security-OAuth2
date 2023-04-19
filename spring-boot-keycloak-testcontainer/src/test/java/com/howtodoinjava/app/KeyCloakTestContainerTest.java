@@ -27,21 +27,23 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class KeyCloakTestContainerTest {
-  private static final Logger LOGGER = LoggerFactory.getLogger(KeyCloakTestContainerTest.class.getName());
+
+  private static final Logger LOGGER
+      = LoggerFactory.getLogger(KeyCloakTestContainerTest.class.getName());
 
   @LocalServerPort
   private int port;
 
-  static final KeycloakContainer keycloak;
-
-  static {
-    keycloak = new KeycloakContainer().withRealmImportFile("c:\\temp\\howtodoinjava-realm-export.json");
-    keycloak.start();
-  }
+  @Container
+  static KeycloakContainer keycloak
+      = new KeycloakContainer().withRealmImportFile("keycloak/realm-export.json");
 
   @PostConstruct
   public void init() {
@@ -50,15 +52,16 @@ public class KeyCloakTestContainerTest {
 
   @DynamicPropertySource
   static void registerResourceServerIssuerProperty(DynamicPropertyRegistry registry) {
-    registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> keycloak.getAuthServerUrl() + "/realms/howtodoinjava");
+    registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
+        () -> keycloak.getAuthServerUrl() + "realms/howtodoinjava-realm");
   }
 
-  protected String getJaneDoeBearer() {
+  protected String getBearerToken() {
 
     try {
-      URI authorizationURI = new URIBuilder(keycloak.getAuthServerUrl() + "/realms/howtodoinjava/protocol/openid-connect/token").build();
-      WebClient webclient = WebClient.builder()
-          .build();
+      URI authorizationURI = new URIBuilder(keycloak.getAuthServerUrl()
+          + "realms/howtodoinjava-realm/protocol/openid-connect/token").build();
+      WebClient webclient = WebClient.builder().build();
       MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
       formData.put("grant_type", Collections.singletonList("password"));
       formData.put("client_id", Collections.singletonList("employee-management-api"));
@@ -74,27 +77,23 @@ public class KeyCloakTestContainerTest {
           .block();
 
       JacksonJsonParser jsonParser = new JacksonJsonParser();
-
-      return "Bearer " + jsonParser.parseMap(result)
-          .get("access_token")
-          .toString();
+      return "Bearer " + jsonParser.parseMap(result).get("access_token").toString();
     } catch (URISyntaxException e) {
       LOGGER.error("Can't obtain an access token from Keycloak!", e);
     }
-
     return null;
   }
 
   @Test
   void givenAuthenticatedUser_whenGetMe_shouldReturnMyInfo() {
 
-    given().header("Authorization", getJaneDoeBearer())
+    given().header("Authorization", getBearerToken())
         .when()
         .get("/users/me")
         .then()
         .body("username", equalTo("test-user"))
-        .body("lastname", equalTo(""))
-        .body("firstname", equalTo("TestUser"))
+        .body("lastName", equalTo(""))
+        .body("firstName", equalTo("TestUser"))
         .body("email", equalTo("test-user@howtodoinjava.com"));
   }
 }
