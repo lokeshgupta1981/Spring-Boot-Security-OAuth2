@@ -35,17 +35,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class KeyCloakTestContainerTest {
+public class KeyCloakTestContainerTestWithDefaultSetup {
 
-  private static final Logger LOGGER
-      = LoggerFactory.getLogger(KeyCloakTestContainerTest.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(KeyCloakTestContainerTest.class.getName());
 
   @LocalServerPort
   private int port;
 
   @Container
-  static KeycloakContainer keycloak
-      = new KeycloakContainer().withRealmImportFile("keycloak/realm-export.json");
+  static KeycloakContainer keycloak = new KeycloakContainer();
 
   @PostConstruct
   public void init() {
@@ -55,20 +53,22 @@ public class KeyCloakTestContainerTest {
   @DynamicPropertySource
   static void registerResourceServerIssuerProperty(DynamicPropertyRegistry registry) {
     registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
-        () -> keycloak.getAuthServerUrl() + "realms/howtodoinjava-realm");
+        () -> keycloak.getAuthServerUrl() + "realms/master");
   }
 
   protected String getBearerToken_v2() {
 
-    try (Keycloak keycloakAdminClient = KeycloakBuilder.builder()
-        .serverUrl(keycloak.getAuthServerUrl())
-        .realm("master")
-        .clientId("admin-cli")
-        .username(keycloak.getAdminUsername())
-        .password(keycloak.getAdminPassword())
-        .build()) {
+    try {
+      Keycloak keycloakAdminClient = KeycloakBuilder.builder()
+          .serverUrl(keycloak.getAuthServerUrl())
+          .realm("master")
+          .clientId("admin-cli")
+          .username(keycloak.getAdminUsername())
+          .password(keycloak.getAdminPassword())
+          .build();
 
       String access_token = keycloakAdminClient.tokenManager().getAccessToken().getToken();
+
 
       return "Bearer " + access_token;
     } catch (Exception e) {
@@ -81,13 +81,13 @@ public class KeyCloakTestContainerTest {
 
     try {
       URI authorizationURI = new URIBuilder(keycloak.getAuthServerUrl()
-          + "realms/howtodoinjava-realm/protocol/openid-connect/token").build();
+          + "realms/master/protocol/openid-connect/token").build();
       WebClient webclient = WebClient.builder().build();
       MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
       formData.put("grant_type", Collections.singletonList("password"));
-      formData.put("client_id", Collections.singletonList("employee-management-api"));
-      formData.put("username", Collections.singletonList("test-user"));
-      formData.put("password", Collections.singletonList("password"));
+      formData.put("client_id", Collections.singletonList("admin-cli"));
+      formData.put("username", Collections.singletonList(keycloak.getAdminUsername()));
+      formData.put("password", Collections.singletonList(keycloak.getAdminPassword()));
 
       String result = webclient.post()
           .uri(authorizationURI)
@@ -108,13 +108,13 @@ public class KeyCloakTestContainerTest {
   @Test
   void givenAuthenticatedUser_whenGetMe_shouldReturnMyInfo() {
 
-    given().header("Authorization", getBearerToken())
+    given().header("Authorization", getBearerToken_v2())
         .when()
         .get("/users/me")
         .then()
-        .body("username", equalTo("test-user"))
-        .body("lastName", equalTo(""))
-        .body("firstName", equalTo("TestUser"))
-        .body("email", equalTo("test-user@howtodoinjava.com"));
+        .body("username", equalTo("admin"))
+        /*.body("lastName", equalTo(""))
+        .body("firstName", equalTo("admin"))
+        .body("email", equalTo("test-user@howtodoinjava.com"))*/;
   }
 }
